@@ -4,6 +4,9 @@ import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@heroui/react";
 import { Menu, X } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+
+
 
 const navLinks = [
   {
@@ -21,7 +24,16 @@ const navLinks = [
 ];
 
 export default function Navbar() {
+
+  const { data: session, isPending, } = authClient.useSession();
+  const user = session?.user
+  // console.log(user)
+  const handalSignOut = async ()=>{
+      await authClient.signOut();
+  }
+
   const [isOpen, setIsOpen] = useState(false);
+
 
   return (
     <header className="w-full  ">
@@ -56,21 +68,24 @@ export default function Navbar() {
 
               {/* Auth Buttons */}
               <div className="flex items-center gap-6">
+               { user? <>
+                 <p className="text-white">{user.name}</p>
+                <Button variant="danger" onClick={handalSignOut}>SignOut</Button>
+               </>
+               :
                 <Link
-                  href="/login"
-                  className="text-violet-400 hover:text-violet-300 font-medium transition-colors"
-                >
+                  href="/signin"
+                  className="text-violet-400 hover:text-violet-300 font-medium transition-colors">
                   Sign In
+                </Link>}
+                <Link href="signup">
+                  <Button
+                    color="secondary"
+                    className="px-6 font-medium">
+                    Get Started
+                  </Button>
                 </Link>
 
-                <Button
-                  as={Link}
-                  href="/register"
-                  color="secondary"
-                  className="px-6 font-medium"
-                >
-                  Get Started
-                </Button>
               </div>
             </div>
 
@@ -100,21 +115,19 @@ export default function Navbar() {
 
                 <div className="border-t border-white/10 pt-5 flex flex-col gap-4">
                   <Link
-                    href="/login"
+                    href="/signin"
                     onClick={() => setIsOpen(false)}
-                    className="text-violet-400 font-medium"
-                  >
+                    className="text-violet-400 font-medium">
                     Sign In
                   </Link>
 
-                  <Button
-                    as={Link}
-                    href="/register"
-                    color="secondary"
-                    className="w-full"
-                  >
-                    Get Started
-                  </Button>
+                  <Link href={"/signup"}>
+                    <Button
+                      color="secondary"
+                      className="px-6 font-medium w-full">
+                      Get Started
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>
